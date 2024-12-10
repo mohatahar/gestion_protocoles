@@ -1,6 +1,10 @@
 <?php
 require_once 'db.php';
-session_start();
+require_once 'auth_check.php';
+require_once 'header.php';
+
+$auth = AuthenticationManager::getInstance();
+$auth->enforceAuthentication();
 
 // Récupération de l'ID du protocole
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -99,9 +103,9 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modifier le Protocole - EPH SOBHA</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="assets/bootstrap-5.3.3-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/fontawesome-free-6.7.1-web/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/css2.css">
     <style>
         :root {
             --primary-color: #4f46e5;
@@ -382,9 +386,10 @@ try {
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="assets/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/jquery/jquery-3.6.0.min.js"></script>
+    <script src="assets/popper/popper.min.js"></script>
+    <script src="assets/bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
     <script>
     // Animation pour les messages d'alerte
     $('.alert').fadeIn('slow');
@@ -411,3 +416,5 @@ try {
     </script>
 </body>
 </html>
+
+<?php include 'footer.php'; ?>

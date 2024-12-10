@@ -1,5 +1,10 @@
 <?php
-include 'db.php';
+require_once 'db.php';
+require_once 'auth_check.php';
+require_once 'header.php';
+
+$auth = AuthenticationManager::getInstance();
+$auth->enforceAuthentication();
 
 // Vérifier si un ID a été passé dans l'URL
 if (!isset($_GET['id']) || empty($_GET['id'])) {
@@ -30,8 +35,8 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protocole</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="assets/bootstrap-5.3.3-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/fontawesome-free-6.7.1-web/css/all.min.css" rel="stylesheet">
 
     <style>
         :root {
@@ -297,8 +302,8 @@ try {
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="assets/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/sweetalert/sweetalert2@11.js"></script>
 
 <script>
     document.querySelector('.delete-protocol').addEventListener('click', function() {
@@ -322,3 +327,5 @@ try {
 
 </body>
 </html>
+
+<?php include 'footer.php'; ?>

@@ -1,5 +1,8 @@
 <?php
 require_once 'db.php';
+require_once 'auth_check.php';
+$auth = AuthenticationManager::getInstance();
+$auth->enforceAuthentication();
 require_once 'vendor/autoload.php'; // Require TCPDF library
 
 // Vérifier si l'ID est fourni

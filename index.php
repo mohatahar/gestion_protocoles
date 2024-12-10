@@ -1,6 +1,15 @@
 <?php
 require_once 'db.php';
-session_start();
+require_once 'auth_check.php';
+$auth = AuthenticationManager::getInstance();
+$auth->enforceAuthentication();
+
+$page_title = 'Gestion des Protocoles';
+$show_page_header = true;
+$page_header_icon = 'fas fa-file-alt';
+$page_header_title = 'Gestion des Protocoles Opératoires';
+$page_header_description = 'Ajoutez et gérez les protocoles opératoires des patients';
+require_once 'header.php';
 
 // Récupérer le nom du mois actuel en français
 setlocale(LC_TIME, 'fr_FR.UTF-8');
@@ -40,34 +49,20 @@ $current_quarter_count = $pdo->query("SELECT COUNT(*)
                                      WHERE date_operation BETWEEN '$current_quarter_start' AND '$current_quarter_end'")
     ->fetchColumn();
 
-// Récupérer le nombre de protocoles créés par trimestre
-$quarter1_start = date('Y-m-d', mktime(0, 0, 0, 1, 1, $current_year));
-$quarter1_end = date('Y-m-t', mktime(0, 0, 0, 3, 1, $current_year));
-$quarter1_count = $pdo->query("SELECT COUNT(*) 
-                              FROM protocoles
-                              WHERE date_operation BETWEEN '$quarter1_start' AND '$quarter1_end'")
+// Définir les dates de début et de fin de l'année
+$current_year_start = "$current_year-01-01";  // 1er janvier de l'année actuelle
+$current_year_end = "$current_year-12-31";    // 31 décembre de l'année actuelle
+
+// Requête pour obtenir le nombre de protocoles pour l'année complète
+$current_year_count = $pdo->query(
+    "SELECT COUNT(*) 
+     FROM protocoles
+     WHERE date_operation BETWEEN '$current_year_start' AND '$current_year_end' 
+     AND YEAR(date_operation) = '$current_year'"
+)
+
     ->fetchColumn();
 
-$quarter2_start = date('Y-m-d', mktime(0, 0, 0, 4, 1, $current_year));
-$quarter2_end = date('Y-m-t', mktime(0, 0, 0, 6, 1, $current_year));
-$quarter2_count = $pdo->query("SELECT COUNT(*) 
-                              FROM protocoles
-                              WHERE date_operation BETWEEN '$quarter2_start' AND '$quarter2_end'")
-    ->fetchColumn();
-
-$quarter3_start = date('Y-m-d', mktime(0, 0, 0, 7, 1, $current_year));
-$quarter3_end = date('Y-m-t', mktime(0, 0, 0, 9, 1, $current_year));
-$quarter3_count = $pdo->query("SELECT COUNT(*) 
-                              FROM protocoles
-                              WHERE date_operation BETWEEN '$quarter3_start' AND '$quarter3_end'")
-    ->fetchColumn();
-
-$quarter4_start = date('Y-m-d', mktime(0, 0, 0, 10, 1, $current_year));
-$quarter4_end = date('Y-m-t', mktime(0, 0, 0, 12, 1, $current_year));
-$quarter4_count = $pdo->query("SELECT COUNT(*) 
-                              FROM protocoles
-                              WHERE date_operation BETWEEN '$quarter4_start' AND '$quarter4_end'")
-    ->fetchColumn();
 
 
 // Pagination
@@ -148,39 +143,40 @@ function sortIcon($column, $currentSort, $currentOrder)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion des Protocoles Opératoires</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="assets/bootstrap-5.3.3-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/fontawesome-free-6.7.1-web/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/css2.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
     <div class="container">
-        <div class="page-header text-center">
-            <div class="container">
-                <h1><i class="fas fa-file-alt me-2"></i> Gestion des Protocoles Opératoires - EPH SOBHA</h1>
-                <p class="lead">Ajoutez et gérez les protocoles opératoires des patients</p>
-            </div>
-        </div>
 
         <div class="row mb-4">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="stats-card">
                     <h5>Total des protocoles</h5>
                     <h2><?php echo $total_records; ?></h2>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="stats-card">
                     <h5>Total de Protocoles en <?php echo ucfirst($mois_actuel); ?></h5>
                     <h2><?php echo isset($current_month_count) ? $current_month_count : 0; ?></h2>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="stats-card">
                     <h5>Total de Protocoles de ce trimestre (<?php echo $trimestre_periode; ?>)</h5>
                     <h2><?php echo isset($current_quarter_count) ? $current_quarter_count : 0; ?></h2>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <h5>Total de Protocoles de l'année
+                        <script>document.write(new Date().getFullYear());</script>
+                    </h5>
+                    <h2><?php echo isset($current_year_count) ? $current_year_count : 0; ?></h2>
                 </div>
             </div>
         </div>
@@ -341,10 +337,10 @@ function sortIcon($column, $currentSort, $currentOrder)
     </div>
 
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/jquery/jquery-3.6.0.min.js"></script>
+    <script src="assets/popper/popper.min.js"></script>
+    <script src="assets/bootstrap/bootstrap.min.js"></script>
+    <script src="assets/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function confirmDelete(id) {
             $('#deleteModal').modal('show');
@@ -368,3 +364,5 @@ function sortIcon($column, $currentSort, $currentOrder)
 </body>
 
 </html>
+
+<?php include 'footer.php'; ?>
